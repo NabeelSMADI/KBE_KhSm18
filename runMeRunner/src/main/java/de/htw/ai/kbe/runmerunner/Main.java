@@ -22,7 +22,7 @@ public class Main {
 
     private boolean fileCreated = false;
     private Class className = null;
-    private String ouputFile = "Report.txt";
+    private String ouputFile = null;
 
     /**
      * @param args the command line arguments
@@ -67,12 +67,21 @@ public class Main {
                 System.out.println("Default Output File name: Report.txt");
             }
         } catch (ParseException e) {
-            int lastindex = args.length - 1;
-            if (args[lastindex].equals("-o")) {
-                args[lastindex] = "";
-                checkArgs(args);
+            boolean missingO = false;
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].equals("-o")) {
+                    args[i] = "";
+                    missingO = true;
+                }
             }
-            return e.getMessage();
+            String massage = e.getMessage();
+            if (missingO) {
+                String checkMassage = checkArgs(args);
+                 if(!checkMassage.equals("True")){
+                     massage = checkMassage;
+                 }
+            }
+            return massage;
         }
         return "True";
     }
@@ -133,6 +142,9 @@ public class Main {
     public boolean log(String message) {
         System.out.println(message);
         try {
+            if (ouputFile == null) {
+                ouputFile = "Report.txt";
+            }
             PrintWriter out = new PrintWriter(new FileWriter(ouputFile, true), true);
             if (!fileCreated) {
                 out = new PrintWriter(new FileWriter(ouputFile, false), true);
