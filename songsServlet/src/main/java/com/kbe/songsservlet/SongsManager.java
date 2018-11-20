@@ -48,7 +48,7 @@ public class SongsManager {
         }
     }
 
-    public synchronized void writeSongsToFile() throws FileNotFoundException, IOException {
+    public void writeSongsToFile() throws FileNotFoundException, IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         try (OutputStream os = new BufferedOutputStream(new FileOutputStream(filename))) {
             objectMapper.writeValue(os, OurSongs.values());
@@ -60,7 +60,7 @@ public class SongsManager {
         return objectMapper.writeValueAsString(OurSongs.values());
     }
 
-    public Song addSong(BufferedReader songString) throws FileNotFoundException, IOException {
+    public synchronized Song addSong(BufferedReader songString) throws FileNotFoundException, IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         Song newSong = (Song) objectMapper.readValue(songString, new TypeReference<Song>() {

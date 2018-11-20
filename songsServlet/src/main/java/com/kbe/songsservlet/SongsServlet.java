@@ -73,7 +73,10 @@ public class SongsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            Song newSong = songsManager.addSong(request.getReader());
+            Song newSong = null;
+            synchronized (songsManager) {
+                newSong = songsManager.addSong(request.getReader());
+            }
             if (newSong != null) {
                 response.setStatus(HttpServletResponse.SC_FOUND);
                 response.setHeader("Location", "/songsServlet?songid=" + newSong.getId());
