@@ -46,8 +46,8 @@ public class SongsServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             if (request.getParameter("all") != null) {
                 out.print(songsManager.SongsToJSON());
-            } else if (songsManager.isInteger(request.getParameter("songid"))) {
-                String song = songsManager.getSongAsJSON(Integer.parseInt(request.getParameter("songid")));
+            } else if (songsManager.isInteger(request.getParameter("songId"))) {
+                String song = songsManager.getSongAsJSON(Integer.parseInt(request.getParameter("songId")));
                 if (song != null) {
                     out.print(song);
                 } else {
@@ -79,7 +79,7 @@ public class SongsServlet extends HttpServlet {
             }
             if (newSong != null) {
                 response.setStatus(HttpServletResponse.SC_FOUND);
-                response.setHeader("Location", "/songsServlet?songid=" + newSong.getId());
+                response.setHeader("Location", "/songsServlet?songId=" + newSong.getId());
             } else {
                 try (PrintWriter out = response.getWriter()) {
                     out.print("Song Title is Missing");

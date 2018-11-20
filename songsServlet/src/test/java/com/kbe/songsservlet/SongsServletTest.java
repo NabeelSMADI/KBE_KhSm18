@@ -114,7 +114,7 @@ public class SongsServletTest {
 
     @Test
     public void testDoGetGetSong01() throws IOException, ServletException {
-        when(request.getParameter("songid")).thenReturn("1");
+        when(request.getParameter("songId")).thenReturn("1");
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -130,7 +130,7 @@ public class SongsServletTest {
 
     @Test
     public void testDoGetGetSong02() throws IOException, ServletException {
-        when(request.getParameter("songid")).thenReturn("test");
+        when(request.getParameter("songId")).thenReturn("test");
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -145,7 +145,7 @@ public class SongsServletTest {
 
     @Test
     public void testDoGetGetSong03() throws IOException, ServletException {
-        when(request.getParameter("songid")).thenReturn("500");
+        when(request.getParameter("songId")).thenReturn("500");
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
