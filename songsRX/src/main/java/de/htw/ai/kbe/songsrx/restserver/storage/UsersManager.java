@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
  */
 public class UsersManager {
 
-    private volatile static TreeMap<String, User> storage = new TreeMap<String, User>();
+    private volatile TreeMap<String, User> storage = new TreeMap<String, User>();
 
-    private static UsersManager instance = null;
-    private static final String filename = "/users.json";
+    private UsersManager instance = null;
+    private final String filename = "/users.json";
 
     private UsersManager() {
         Map<String, User> users = readUsersFromFile();
