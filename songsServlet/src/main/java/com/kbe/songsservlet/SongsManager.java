@@ -15,6 +15,9 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -40,6 +43,12 @@ public class SongsManager {
 
     @SuppressWarnings("unchecked")
     private Map<Integer, Song> readSongsFromFile() throws FileNotFoundException, IOException {
+        File file = new File(filename);
+        if (file.exists()) {
+            System.out.println("file found");
+            System.out.println(Files.readAllBytes(Paths.get("testOutPut.json")));
+
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         try (InputStream is = new BufferedInputStream(new FileInputStream(filename))) {
             List<Song> OurSongsList = (List<Song>) objectMapper.readValue(is, new TypeReference<List<Song>>() {
@@ -106,7 +115,5 @@ public class SongsManager {
     public void setFilename(String filename) {
         this.filename = filename;
     }
-    
-    
 
 }

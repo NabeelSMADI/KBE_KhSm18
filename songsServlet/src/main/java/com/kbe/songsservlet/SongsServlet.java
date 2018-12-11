@@ -43,8 +43,10 @@ public class SongsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json");
+        System.out.println("startget");
         try (PrintWriter out = response.getWriter()) {
             if (request.getParameter("all") != null) {
+                        System.out.println("all found");
                 out.print(songsManager.SongsToJSON());
             } else if (songsManager.isInteger(request.getParameter("songId"))) {
                 String song = songsManager.getSongAsJSON(Integer.parseInt(request.getParameter("songId")));
