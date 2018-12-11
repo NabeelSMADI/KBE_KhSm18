@@ -30,12 +30,10 @@ import java.util.stream.Collectors;
  */
 public class SongsManager {
 
-    private volatile static TreeMap<Integer, Song> storage = new TreeMap<Integer, Song>();
+    private volatile TreeMap<Integer, Song> storage = new TreeMap<Integer, Song>();
 
-    
-    
-    private static SongsManager instance = null;
-    private static final String filename = "/songs.json";
+    private SongsManager instance = null;
+    private final String filename = "/songs.json";
 
     private SongsManager() {
         Map<Integer, Song> songs = readSongsFromFile();
