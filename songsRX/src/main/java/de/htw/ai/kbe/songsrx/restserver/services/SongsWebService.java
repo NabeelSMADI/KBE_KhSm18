@@ -106,6 +106,7 @@ public class SongsWebService {
     }
 
     @DELETE
+    @Path("/{id}")
     @Auth
     public Response delSong(@PathParam("id") Integer id) {
         if (SongsManager.getInstance().delSong(id)) {
@@ -115,7 +116,6 @@ public class SongsWebService {
             return Response.status(Response.Status.NOT_FOUND).entity("No song found with id " + id).build();
         }
     }
-
 
     @PreDestroy
     void SaveDataToFile() throws IOException, FileNotFoundException, URISyntaxException {

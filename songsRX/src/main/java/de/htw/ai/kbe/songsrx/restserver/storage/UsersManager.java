@@ -30,7 +30,7 @@ public class UsersManager {
 
     private volatile TreeMap<String, User> storage = new TreeMap<String, User>();
 
-    private UsersManager instance = null;
+    private static UsersManager instance = null;
     private final String filename = "/users.json";
 
     private UsersManager() {

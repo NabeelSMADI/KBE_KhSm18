@@ -32,7 +32,7 @@ public class SongsManager {
 
     private volatile TreeMap<Integer, Song> storage = new TreeMap<Integer, Song>();
 
-    private SongsManager instance = null;
+    private static SongsManager instance = null;
     private final String filename = "/songs.json";
 
     private SongsManager() {
