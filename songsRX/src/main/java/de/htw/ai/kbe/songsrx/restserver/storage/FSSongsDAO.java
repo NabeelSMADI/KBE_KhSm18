@@ -23,58 +23,41 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.inject.Singleton;
 
 /**
  *
  * @author smadi
  */
-public class SongsManager {
+@Singleton
+public class FSSongsDAO implements SongsDAO {
 
-    private volatile static TreeMap<Integer, Song> storage = new TreeMap<Integer, Song>();
+    private volatile TreeMap<Integer, Song> storage = new TreeMap<Integer, Song>();
 
-    
-    
-    private static SongsManager instance = null;
-    private static final String filename = "/songs.json";
+    private final String filename = "/songs.json";
 
-    private SongsManager() {
+    public FSSongsDAO() {
         Map<Integer, Song> songs = readSongsFromFile();
         if (songs != null) {
             storage = new TreeMap<>(songs);
         }
     }
 
-
-    public synchronized static SongsManager getInstance() {
-        if (instance == null) {
-            instance = new SongsManager();
-        }
-        return instance;
-    }
-
-   private Map<Integer, Song> readSongsFromFile() {
+    private Map<Integer, Song> readSongsFromFile() {
         ObjectMapper objectMapper = new ObjectMapper();
-        try (InputStream is = SongsManager.class.getResourceAsStream(filename)) {
+        try (InputStream is = FSSongsDAO.class.getResourceAsStream(filename)) {
             List<Song> OurSongsList = (List<Song>) objectMapper.readValue(is, new TypeReference<List<Song>>() {
             });
             return OurSongsList.stream().collect(Collectors.toMap(Song::getId, Song -> Song));
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(SongsManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FSSongsDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SongsManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FSSongsDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
 
-    public void writeSongsToFile() throws FileNotFoundException, IOException, URISyntaxException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        URL resourceUrl = getClass().getResource(filename);
-        File file = new File(resourceUrl.toURI());
-        try (OutputStream os =  new FileOutputStream(file)){;
-            objectMapper.writeValue(os, storage.values());
-        }
-    }
-
+    @Override
     public synchronized Song addSong(Song song) {
         if (storage.size() > 0) {
             song.setId(storage.lastKey() + 1);
@@ -88,6 +71,7 @@ public class SongsManager {
         return null;
     }
 
+    @Override
     public List<Song> getAllSongs() {
         if (storage == null) {
             return null;
@@ -95,6 +79,7 @@ public class SongsManager {
         return new ArrayList<>(storage.values());
     }
 
+    @Override
     public Song getSong(int id) {
         if (storage.get(id) == null) {
             return null;
@@ -102,6 +87,7 @@ public class SongsManager {
         return storage.get(id);
     }
 
+    @Override
     public boolean updateSong(Song song) {
         if (storage.get(song.getId()) != null) {
             storage.put(song.getId(), song);
@@ -111,12 +97,31 @@ public class SongsManager {
         }
     }
 
+    @Override
     public boolean delSong(int id) {
         if (storage.get(id) != null) {
             storage.remove(id);
             return true;
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public void preDestroy() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            URL resourceUrl = getClass().getResource(filename);
+            File file = new File(resourceUrl.toURI());
+            try (OutputStream os = new FileOutputStream(file)) {;
+                objectMapper.writeValue(os, storage.values());
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(FSSongsDAO.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(FSSongsDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(FSSongsDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

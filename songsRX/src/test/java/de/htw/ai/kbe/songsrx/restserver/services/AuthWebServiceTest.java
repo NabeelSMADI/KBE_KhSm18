@@ -5,28 +5,45 @@
  */
 package de.htw.ai.kbe.songsrx.restserver.services;
 
-import de.htw.ai.kbe.songsrx.restserver.auth.JWTAuth;
 import de.htw.ai.kbe.songsrx.restserver.auth.JWTAuthTokenFilter;
 import de.htw.ai.kbe.songsrx.restserver.bean.Song;
-import de.htw.ai.kbe.songsrx.restserver.storage.SongsManager;
+import de.htw.ai.kbe.songsrx.restserver.storage.DBSongsDAO;
+import de.htw.ai.kbe.songsrx.restserver.storage.DBUsersDAO;
+import de.htw.ai.kbe.songsrx.restserver.storage.SongsDAO;
+import de.htw.ai.kbe.songsrx.restserver.storage.UsersDAO;
+import javax.inject.Singleton;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class AuthWebServiceTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.register(SongsWebService.class);
-        resourceConfig.register(AuthWebService.class);
-        resourceConfig.register(JWTAuthTokenFilter.class);
-        return resourceConfig;
+        return new ResourceConfig(SongsWebService.class)
+                .packages(true, "de.htw.ai.kbe.songsrx.restserver.services")
+                .packages(true, "de.htw.ai.kbe.songsrx.restserver.auth")
+                .register(new AbstractBinder() {
+                    @Override
+                    protected void configure() {
+                        bind(Persistence
+                                .createEntityManagerFactory("songsRX-Test-PU"))
+                                .to(EntityManagerFactory.class);
+                        bind(DBSongsDAO.class)
+                                .to(SongsDAO.class)
+                                .in(Singleton.class);
+                        bind(DBUsersDAO.class)
+                                .to(UsersDAO.class)
+                                .in(Singleton.class);
+                    }
+                });
     }
 
     @Test
@@ -34,8 +51,8 @@ public class AuthWebServiceTest extends JerseyTest {
         Response response = target("/auth").queryParam("userId", "mmuster").request().get();
         String content = response.readEntity(String.class);
         Assert.assertEquals(200, response.getStatus());
-        String id = JWTAuth.getId(content);
-        String userId = JWTAuth.getUserId(content);
+        String id = JWTAuthTokenFilter.getId(content);
+        String userId = JWTAuthTokenFilter.getUserId(content);
         Assert.assertEquals("1", id);
         Assert.assertEquals("mmuster", userId);
     }
@@ -59,7 +76,6 @@ public class AuthWebServiceTest extends JerseyTest {
         song.setReleased(1);
         Response response2 = target("/songs/10").request().header("Authorization", authToken).put(Entity.json(song));
         Assert.assertEquals(204, response2.getStatus());
-        Assert.assertEquals("test1", SongsManager.getInstance().getSong(10).getTitle());
     }
 
     @Test

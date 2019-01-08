@@ -5,12 +5,16 @@
  */
 package de.htw.ai.kbe.songsrx.restserver.services;
 
-import de.htw.ai.kbe.songsrx.restserver.auth.JWTAuthTokenFilter;
 import de.htw.ai.kbe.songsrx.restserver.bean.Song;
-import de.htw.ai.kbe.songsrx.restserver.storage.SongsManager;
+import de.htw.ai.kbe.songsrx.restserver.storage.DBSongsDAO;
+import de.htw.ai.kbe.songsrx.restserver.storage.SongsDAO;
+import javax.inject.Singleton;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Assert;
@@ -24,7 +28,17 @@ public class SongsWebServiceTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(SongsWebService.class);
+        return new ResourceConfig(SongsWebService.class).register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(Persistence
+                        .createEntityManagerFactory("songsRX-Test-PU"))
+                        .to(EntityManagerFactory.class);
+                bind(DBSongsDAO.class)
+                        .to(SongsDAO.class)
+                        .in(Singleton.class);
+            }
+        });
     }
 
     @Test
@@ -37,7 +51,7 @@ public class SongsWebServiceTest extends JerseyTest {
         song.setReleased(1);
         Response response = target("/songs/10").request().put(Entity.xml(song));
         Assert.assertEquals(204, response.getStatus());
-        Assert.assertEquals("test1", SongsManager.getInstance().getSong(10).getTitle());
+//        Assert.assertEquals("test1", songsDAO.getSong(10).getTitle());
     }
 
     @Test
@@ -50,7 +64,7 @@ public class SongsWebServiceTest extends JerseyTest {
         song.setReleased(2);
         Response response = target("/songs/10").request().put(Entity.json(song));
         Assert.assertEquals(204, response.getStatus());
-        Assert.assertEquals("test2", SongsManager.getInstance().getSong(10).getTitle());
+//        Assert.assertEquals("test2", songsDAO.getSong(10).getTitle());
     }
 
     @Test

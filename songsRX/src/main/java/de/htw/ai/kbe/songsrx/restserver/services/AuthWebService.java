@@ -5,9 +5,10 @@
  */
 package de.htw.ai.kbe.songsrx.restserver.services;
 
-import de.htw.ai.kbe.songsrx.restserver.auth.JWTAuth;
+import de.htw.ai.kbe.songsrx.restserver.auth.JWTAuthTokenFilter;
 import de.htw.ai.kbe.songsrx.restserver.bean.User;
-import de.htw.ai.kbe.songsrx.restserver.storage.UsersManager;
+import de.htw.ai.kbe.songsrx.restserver.storage.UsersDAO;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,13 +22,21 @@ import javax.ws.rs.core.Response;
  */
 @Path("/auth")
 public class AuthWebService {
+    
+    private UsersDAO usersDAO;
+
+    @Inject
+    public AuthWebService(UsersDAO dao) {
+        this.usersDAO = dao;
+    }
+
 
     @GET
     @Produces({MediaType.TEXT_PLAIN})
     public Response getUserAuthToken(@QueryParam("userId") String userId) {
-        User user = UsersManager.getInstance().getUser(userId);
+        User user = usersDAO.getUser(userId);
         if (user != null) {
-            return Response.ok(JWTAuth.generateAuthToken(user)).build();
+            return Response.ok(JWTAuthTokenFilter.generateAuthToken(user)).build();
         } else {
             return Response.status(Response.Status.FORBIDDEN).entity("No UserId found with id " + userId).build();
         }
