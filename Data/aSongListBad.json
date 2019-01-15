@@ -1,0 +1,8 @@
+{
+    "isPublic": true,
+    "songs": [
+        {"id": 1},
+        {"id": 99},
+        {"id": 3}
+    ]
+}
